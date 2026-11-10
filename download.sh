@@ -7,6 +7,12 @@
 #   ./download.sh --list     # list all available quants and sizes
 #   ./download.sh --mmproj   # additionally download the mmproj file(s)
 set -euo pipefail
+# Reject unexpected extra arguments: a stray extra arg must never start a download.
+if [ "$#" -gt 1 ]; then
+  echo "ERROR: too many arguments (expected at most 1). Usage: ./download.sh [QUANT|--list|--mmproj|--help]" >&2
+  exit 1
+fi
+
 
 HF_REPO="mradermacher/Ornith-1.5-9B-uncensored-GGUF"
 BASE="https://huggingface.co/$HF_REPO/resolve/main"
@@ -88,6 +94,13 @@ download_quant() {
 case "${1:-}" in
   --list) list_quants ;;
   --mmproj) download_mmproj ;;
+  -h|--help)
+    echo "Usage: ./download.sh [QUANT]"
+    echo "       ./download.sh --list        list all available quants and sizes"
+    echo "       ./download.sh --mmproj      download the mmproj vision file only"
+    echo "Default QUANT: $DEFAULT_QUANT"
+    ;;
+
   "") download_quant "$DEFAULT_QUANT" ;;
   *) download_quant "$1" ;;
 esac
